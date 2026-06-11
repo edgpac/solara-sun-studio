@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { HUD } from "@/components/HUD";
 import { getLevel, type Level } from "@/lib/game/levels";
-import { saveLevelResult } from "@/lib/game/storage";
+import { saveLevelResult, addToCareerTotal } from "@/lib/game/storage";
 
 export const Route = createFileRoute("/play/$level")({
   head: ({ params }) => ({
@@ -42,6 +42,7 @@ interface CompletionState {
   score: number;
   stars: number;
   cleared: boolean;
+  careerTotal: number;
 }
 
 function PlayPage() {
@@ -80,10 +81,11 @@ function Session({
   const [seed, setSeed] = useState(0);
 
   const handleComplete = useCallback(
-    (r: CompletionState) => {
+    (r: { score: number; stars: number; cleared: boolean }) => {
       console.log(`[SOL] level ${level.id} complete — stars:${r.stars} score:${r.score} cleared:${r.cleared}`);
       saveLevelResult(level.id, r.stars, r.score);
-      setDone(r);
+      const { careerTotal } = addToCareerTotal(r.score);
+      setDone({ ...r, careerTotal });
     },
     [level.id],
   );
@@ -182,10 +184,25 @@ function CompletionOverlay({
           ))}
         </div>
 
-        <div className="tile-gold inline-block px-6 py-3 mb-7">
-          <div className="text-[10px] uppercase tracking-wider opacity-80">Score</div>
+        <div className="tile-gold inline-block px-6 py-3 mb-4">
+          <div className="text-[10px] uppercase tracking-wider opacity-80">Level Score</div>
           <div className="display text-3xl font-bold tabular-nums">
             {result.score.toLocaleString()}
+          </div>
+        </div>
+
+        <div className="mb-7">
+          <div className="text-[9px] uppercase tracking-[0.25em] text-muted-foreground mb-1">
+            Career Total
+          </div>
+          <div
+            className="display font-bold tabular-nums text-primary"
+            style={{
+              fontSize: "clamp(2rem, 10vw, 3.5rem)",
+              textShadow: "0 0 40px oklch(0.85 0.20 75 / 0.6)",
+            }}
+          >
+            {result.careerTotal.toLocaleString()}
           </div>
         </div>
 

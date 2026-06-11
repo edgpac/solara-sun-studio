@@ -7,9 +7,10 @@ export interface LevelProgress {
 }
 export interface Progress {
   levels: Record<number, LevelProgress>;
+  careerTotal: number;
 }
 
-const empty: Progress = { levels: {} };
+const empty: Progress = { levels: {}, careerTotal: 0 };
 
 export function loadProgress(): Progress {
   if (typeof window === "undefined") return empty;
@@ -17,10 +18,19 @@ export function loadProgress(): Progress {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return empty;
     const parsed = JSON.parse(raw) as Progress;
-    return { levels: parsed.levels ?? {} };
+    return { levels: parsed.levels ?? {}, careerTotal: parsed.careerTotal ?? 0 };
   } catch {
     return empty;
   }
+}
+
+export function addToCareerTotal(score: number): Progress {
+  const p = loadProgress();
+  const updated = { ...p, careerTotal: p.careerTotal + score };
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(KEY, JSON.stringify(updated));
+  }
+  return updated;
 }
 
 export function saveLevelResult(id: number, stars: number, score: number): Progress {

@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import goldenSun from "@/assets/sun-golden.png";
+import { loadProgress } from "@/lib/game/storage";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,6 +23,11 @@ export const Route = createFileRoute("/")({
 });
 
 function Title() {
+  const [careerTotal, setCareerTotal] = useState(0);
+  useEffect(() => {
+    setCareerTotal(loadProgress().careerTotal);
+  }, []);
+
   return (
     <main className="scene-cabo min-h-screen w-full flex flex-col items-center justify-center px-6 py-12 relative">
       <div className="relative z-10 flex flex-col items-center text-center max-w-2xl">
@@ -57,9 +64,29 @@ function Title() {
         >
           SOL <span className="italic font-normal">de</span> CABO
         </h1>
-        <p className="display italic text-lg sm:text-xl text-cream/90 mb-10 max-w-md">
+        <p className="display italic text-lg sm:text-xl text-cream/90 mb-6 max-w-md">
           Match the Suns. Awaken the Light.
         </p>
+
+        {careerTotal > 0 && (
+          <div className="mb-8 text-center">
+            <div className="text-[9px] uppercase tracking-[0.3em] text-cream/50 mb-1">
+              Career Score
+            </div>
+            <div
+              className="display font-bold tabular-nums"
+              style={{
+                fontSize: "clamp(1.8rem, 8vw, 3rem)",
+                background: "linear-gradient(180deg, oklch(0.96 0.12 85), oklch(0.7 0.20 50))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                textShadow: "0 0 40px oklch(0.78 0.20 65 / 0.4)",
+              }}
+            >
+              {careerTotal.toLocaleString()}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <Link
