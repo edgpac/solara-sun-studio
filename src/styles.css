@@ -1,0 +1,309 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────────────────────
+   SOL DE CABO — Mexican luxury design system
+   Baja sunset palette · ceramic glaze · Talavera artisan polish
+   All colors in oklch. Tokens drive every surface.
+   ───────────────────────────────────────────────────────────── */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+  --radius-2xl: calc(var(--radius) + 14px);
+  --radius-3xl: calc(var(--radius) + 22px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-marigold: var(--marigold);
+  --color-terracotta: var(--terracotta);
+  --color-turquoise: var(--turquoise);
+  --color-talavera: var(--talavera);
+  --color-jade: var(--jade);
+  --color-copper: var(--copper);
+  --color-twilight: var(--twilight);
+  --color-cream: var(--cream);
+
+  --font-display: "Cormorant Garamond", "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.875rem;
+
+  /* Base — warm cream gallery / sunset twilight */
+  --background: oklch(0.18 0.04 35);
+  --foreground: oklch(0.97 0.02 80);
+  --card: oklch(0.22 0.05 30 / 0.7);
+  --card-foreground: oklch(0.97 0.02 80);
+  --popover: oklch(0.18 0.04 35);
+  --popover-foreground: oklch(0.97 0.02 80);
+
+  --primary: oklch(0.78 0.18 65);          /* Marigold gold */
+  --primary-foreground: oklch(0.18 0.04 35);
+  --secondary: oklch(0.62 0.16 220);       /* Talavera blue */
+  --secondary-foreground: oklch(0.97 0.02 80);
+  --muted: oklch(0.28 0.04 30 / 0.6);
+  --muted-foreground: oklch(0.82 0.04 70);
+  --accent: oklch(0.65 0.21 35);           /* Terracotta */
+  --accent-foreground: oklch(0.97 0.02 80);
+  --destructive: oklch(0.62 0.24 25);
+  --destructive-foreground: oklch(0.97 0.02 80);
+  --border: oklch(0.78 0.18 65 / 0.22);
+  --input: oklch(0.3 0.04 30 / 0.6);
+  --ring: oklch(0.78 0.18 65 / 0.6);
+
+  /* Mexican palette */
+  --marigold:   oklch(0.82 0.20 75);
+  --terracotta: oklch(0.62 0.20 35);
+  --turquoise:  oklch(0.72 0.15 195);
+  --talavera:   oklch(0.45 0.20 250);
+  --jade:       oklch(0.55 0.14 155);
+  --copper:     oklch(0.58 0.16 45);
+  --twilight:   oklch(0.32 0.12 295);
+  --cream:      oklch(0.96 0.04 80);
+
+  /* Signature gradients */
+  --gradient-sunset: linear-gradient(
+    180deg,
+    oklch(0.32 0.12 295) 0%,
+    oklch(0.45 0.18 25) 35%,
+    oklch(0.68 0.20 50) 65%,
+    oklch(0.82 0.18 75) 100%
+  );
+  --gradient-ocean: linear-gradient(
+    140deg,
+    oklch(0.28 0.10 240) 0%,
+    oklch(0.45 0.20 250) 50%,
+    oklch(0.72 0.15 195) 100%
+  );
+  --gradient-gold: linear-gradient(
+    135deg,
+    oklch(0.78 0.18 65) 0%,
+    oklch(0.88 0.16 85) 50%,
+    oklch(0.65 0.20 45) 100%
+  );
+  --gradient-tile: linear-gradient(
+    160deg,
+    oklch(0.28 0.06 30 / 0.85) 0%,
+    oklch(0.18 0.04 35 / 0.95) 100%
+  );
+
+  /* Ceramic shadow & glow stack */
+  --shadow-ceramic: 0 1px 0 oklch(1 0 0 / 0.18) inset,
+                    0 -1px 0 oklch(0 0 0 / 0.35) inset,
+                    0 12px 28px -8px oklch(0 0 0 / 0.55),
+                    0 4px 10px -2px oklch(0 0 0 / 0.4);
+  --shadow-glow-gold: 0 0 40px oklch(0.82 0.20 75 / 0.45),
+                      0 0 80px oklch(0.78 0.18 65 / 0.25);
+  --shadow-glow-blue: 0 0 40px oklch(0.62 0.16 220 / 0.5);
+  --shadow-tile: 0 8px 24px -6px oklch(0 0 0 / 0.5),
+                 0 2px 6px -1px oklch(0 0 0 / 0.4),
+                 0 1px 0 oklch(1 0 0 / 0.08) inset;
+}
+
+.dark { /* same palette — game is dark by default */ }
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body { height: 100%; }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
+  }
+  h1, h2, h3, .display { font-family: var(--font-display); letter-spacing: -0.01em; }
+}
+
+/* ─── Backgrounds ─── */
+.bg-sunset { background: var(--gradient-sunset); }
+.bg-ocean  { background: var(--gradient-ocean); }
+.bg-gold   { background: var(--gradient-gold); }
+
+/* Animated Cabo sunset sky */
+.scene-cabo {
+  position: relative;
+  background: var(--gradient-sunset);
+  overflow: hidden;
+}
+.scene-cabo::before {
+  content: "";
+  position: absolute; inset: -20%;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 95%, oklch(0.82 0.18 75 / 0.7), transparent 60%),
+    radial-gradient(circle at 70% 80%, oklch(0.95 0.12 85 / 0.5), transparent 35%);
+  filter: blur(20px);
+  animation: cabo-breathe 12s ease-in-out infinite;
+}
+.scene-cabo::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(2px 2px at 12% 18%, oklch(1 0 0 / 0.7), transparent 60%),
+    radial-gradient(1.5px 1.5px at 28% 12%, oklch(1 0 0 / 0.5), transparent 60%),
+    radial-gradient(2px 2px at 78% 22%, oklch(1 0 0 / 0.6), transparent 60%),
+    radial-gradient(1.5px 1.5px at 88% 8%, oklch(1 0 0 / 0.4), transparent 60%),
+    radial-gradient(1.5px 1.5px at 55% 30%, oklch(1 0 0 / 0.5), transparent 60%);
+  animation: twinkle 5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes cabo-breathe {
+  0%, 100% { opacity: 0.85; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(-1.5%); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
+/* ─── Ceramic tile (buttons, cells) ─── */
+.tile {
+  background: var(--gradient-tile);
+  border: 1px solid oklch(0.78 0.18 65 / 0.25);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-tile);
+  backdrop-filter: blur(8px);
+}
+.tile-gold {
+  background: var(--gradient-gold);
+  color: var(--primary-foreground);
+  border: 1px solid oklch(0.95 0.12 85 / 0.5);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-ceramic), var(--shadow-glow-gold);
+  text-shadow: 0 1px 0 oklch(1 0 0 / 0.4);
+}
+
+/* ─── Sun piece ─── */
+.sun-piece {
+  position: relative;
+  width: 100%; height: 100%;
+  display: grid; place-items: center;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+              filter 0.18s ease;
+  will-change: transform;
+}
+.sun-piece:active { cursor: grabbing; }
+.sun-piece-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px oklch(0 0 0 / 0.5))
+          drop-shadow(0 0 12px oklch(0.78 0.18 65 / 0.15));
+  pointer-events: none;
+  animation: sun-breathe 4s ease-in-out infinite;
+}
+.sun-piece-halo {
+  position: absolute; inset: -8%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.sun-piece:hover .sun-piece-halo,
+.sun-piece.is-selected .sun-piece-halo { opacity: 1; }
+.sun-piece.is-selected {
+  transform: scale(1.08);
+  filter: brightness(1.15);
+  z-index: 10;
+}
+.sun-piece.is-hint  { animation: sun-hint 1.2s ease-in-out infinite; }
+.sun-piece.is-pop   { animation: sun-pop 0.45s ease-out forwards; }
+.sun-piece.is-fall  { animation: sun-fall 0.32s cubic-bezier(0.5, 0, 0.4, 1.2); }
+.sun-piece.is-special { filter: drop-shadow(0 0 16px oklch(0.95 0.18 85 / 0.9)); }
+
+@keyframes sun-breathe {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50%      { transform: scale(1.015) rotate(0.6deg); }
+}
+@keyframes sun-hint {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.1); filter: brightness(1.3); }
+}
+@keyframes sun-pop {
+  0%   { transform: scale(1); opacity: 1; filter: brightness(1.5); }
+  40%  { transform: scale(1.35) rotate(15deg); opacity: 1; filter: brightness(2); }
+  100% { transform: scale(0) rotate(180deg); opacity: 0; }
+}
+@keyframes sun-fall {
+  0%   { transform: translateY(-30%); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
+/* Rotating halo behind selected piece */
+.halo-rays {
+  width: 100%; height: 100%;
+  animation: rays-spin 10s linear infinite;
+}
+@keyframes rays-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Particles ─── */
+.spark {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, oklch(1 0.1 85), oklch(0.78 0.20 65) 60%, transparent);
+  pointer-events: none;
+  animation: spark-fly 0.9s ease-out forwards;
+}
+@keyframes spark-fly {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
+
+/* ─── Combo flash ─── */
+.combo-burst {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--marigold);
+  text-shadow: 0 0 24px oklch(0.95 0.18 85 / 0.9), 0 4px 12px oklch(0 0 0 / 0.6);
+  animation: combo-pop 1s ease-out forwards;
+}
+@keyframes combo-pop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  20%  { transform: scale(1.2); opacity: 1; }
+  80%  { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* ─── Map pin ─── */
+.map-pin {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.map-pin:hover { transform: translateY(-6px) scale(1.06); }
+
+/* Scrollbar polish */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--marigold); border-radius: 8px; opacity: 0.5; }
