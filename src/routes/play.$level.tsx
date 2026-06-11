@@ -81,7 +81,7 @@ function Session({
 
   const handleComplete = useCallback(
     (r: CompletionState) => {
-      if (r.stars > 0) saveLevelResult(level.id, r.stars, r.score);
+      saveLevelResult(level.id, r.stars, r.score);
       setDone(r);
     },
     [level.id],
@@ -199,7 +199,7 @@ function CompletionOverlay({
           >
             Map
           </button>
-          {onNext && result.cleared && (
+          {onNext && (
             <button
               onClick={onNext}
               className="tile-gold flex-1 py-3 text-sm font-bold uppercase tracking-wider hover:scale-[1.02] transition-transform"
