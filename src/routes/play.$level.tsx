@@ -63,7 +63,7 @@ function PlayPage() {
     );
   }
 
-  return <Session level={level} navigateBack={() => navigate({ to: "/map" })} navigate={navigate} />;
+  return <Session key={level.id} level={level} navigateBack={() => navigate({ to: "/map" })} navigate={navigate} />;
 }
 
 function Session({
@@ -81,6 +81,7 @@ function Session({
 
   const handleComplete = useCallback(
     (r: CompletionState) => {
+      console.log(`[SOL] level ${level.id} complete — stars:${r.stars} score:${r.score} cleared:${r.cleared}`);
       saveLevelResult(level.id, r.stars, r.score);
       setDone(r);
     },
@@ -88,6 +89,7 @@ function Session({
   );
 
   const nextLevel = getLevel(level.id + 1);
+  console.log(`[SOL] Session mounted — level:${level.id} nextLevel:${nextLevel.id} moves:${level.moves}`);
 
   return (
     <main className="scene-cabo min-h-screen w-full pb-10 relative">
@@ -123,6 +125,7 @@ function Session({
           onNext={
             nextLevel
               ? () => {
+                  console.log(`[SOL] Next clicked — navigating to level ${nextLevel.id}`);
                   setDone(null);
                   navigate({ to: "/play/$level", params: { level: String(nextLevel.id) } });
                 }

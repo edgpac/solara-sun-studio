@@ -95,6 +95,7 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
     if (moves <= 0) {
       completedRef.current = true;
       const stars = score >= targetThree ? 3 : score >= targetThree * 0.6 ? 2 : score >= targetThree * 0.35 ? 1 : 0;
+      console.log(`[SOL] GameBoard out-of-moves — score:${score} target:${targetThree} stars:${stars}`);
       setTimeout(() => onComplete({ score, stars, cleared: stars >= 1 }), 350);
     }
   }, [moves, score, busy, targetThree, onComplete]);
@@ -201,6 +202,7 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
       // Early victory: hit max stars threshold.
       if (!completedRef.current && score + chainScore >= targetThree && moves - 1 > 0) {
         completedRef.current = true;
+        console.log(`[SOL] GameBoard early-victory — score:${score + chainScore} movesLeft:${moves - 1}`);
         setTimeout(
           () => onComplete({ score: score + chainScore, stars: 3, cleared: true }),
           400,
@@ -247,7 +249,7 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
     d.moved = true;
     void performSwap(d.pos, target);
   };
-  const handlePointerUp = (r: number, c: number) => (e: React.PointerEvent) => {
+  const handlePointerUp = (r: number, c: number) => (_e: React.PointerEvent) => {
     const d = dragRef.current;
     dragRef.current = null;
     if (!d || d.moved) return;
