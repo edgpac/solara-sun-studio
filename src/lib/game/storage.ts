@@ -36,9 +36,8 @@ export function saveLevelResult(id: number, stars: number, score: number): Progr
   return p;
 }
 
-export function isLevelUnlocked(id: number, p: Progress = loadProgress()): boolean {
-  if (id <= 1) return true;
-  return (id - 1) in (p.levels ?? {});
+export function isLevelUnlocked(_id: number, _p?: Progress): boolean {
+  return true;
 }
 
 export function totalStars(p: Progress = loadProgress()): number {
