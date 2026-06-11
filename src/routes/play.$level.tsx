@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-r
 import { useCallback, useState } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { HUD } from "@/components/HUD";
-import { getLevel, LEVELS, type Level } from "@/lib/game/levels";
+import { getLevel, type Level } from "@/lib/game/levels";
 import { saveLevelResult } from "@/lib/game/storage";
 
 export const Route = createFileRoute("/play/$level")({
@@ -87,7 +87,7 @@ function Session({
     [level.id],
   );
 
-  const nextLevel = LEVELS.find((l) => l.id === level.id + 1);
+  const nextLevel = getLevel(level.id + 1);
 
   return (
     <main className="scene-cabo min-h-screen w-full pb-10 relative">
