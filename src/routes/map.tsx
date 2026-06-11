@@ -47,7 +47,7 @@ function ErrorComp({ error, reset }: { error: Error; reset: () => void }) {
 
 function MapPage() {
   // Loaded client-side to avoid SSR/localStorage mismatch.
-  const [progress, setProgress] = useState<Progress>({ levels: {} });
+  const [progress, setProgress] = useState<Progress>({ levels: {}, careerTotal: 0 });
   useEffect(() => {
     setProgress(loadProgress());
   }, []);

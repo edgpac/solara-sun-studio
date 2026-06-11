@@ -4,6 +4,7 @@ import { GameBoard } from "@/components/GameBoard";
 import { HUD } from "@/components/HUD";
 import { getLevel, type Level } from "@/lib/game/levels";
 import { saveLevelResult, addToCareerTotal } from "@/lib/game/storage";
+import { getSessionBase, advanceSession } from "@/lib/game/sessionScore";
 
 export const Route = createFileRoute("/play/$level")({
   head: ({ params }) => ({
@@ -42,6 +43,7 @@ interface CompletionState {
   score: number;
   stars: number;
   cleared: boolean;
+  sessionTotal: number;
   careerTotal: number;
 }
 
@@ -64,15 +66,17 @@ function PlayPage() {
     );
   }
 
-  return <Session key={level.id} level={level} navigateBack={() => navigate({ to: "/map" })} navigate={navigate} />;
+  return <Session key={level.id} level={level} sessionBase={getSessionBase()} navigateBack={() => navigate({ to: "/map" })} navigate={navigate} />;
 }
 
 function Session({
   level,
+  sessionBase,
   navigateBack,
   navigate,
 }: {
   level: Level;
+  sessionBase: number;
   navigateBack: () => void;
   navigate: ReturnType<typeof useNavigate>;
 }) {
@@ -84,10 +88,11 @@ function Session({
     (r: { score: number; stars: number; cleared: boolean }) => {
       console.log(`[SOL] level ${level.id} complete — stars:${r.stars} score:${r.score} cleared:${r.cleared}`);
       saveLevelResult(level.id, r.stars, r.score);
+      advanceSession(r.score);
       const { careerTotal } = addToCareerTotal(r.score);
-      setDone({ ...r, careerTotal });
+      setDone({ ...r, sessionTotal: sessionBase + r.score, careerTotal });
     },
-    [level.id],
+    [level.id, sessionBase],
   );
 
   const nextLevel = getLevel(level.id + 1);
@@ -101,6 +106,7 @@ function Session({
           region={level.region}
           name={level.name}
           score={stats.score}
+          sessionScore={sessionBase + stats.score}
           targetThree={level.stars[2]}
           moves={stats.moves}
           combo={stats.combo}
@@ -184,26 +190,23 @@ function CompletionOverlay({
           ))}
         </div>
 
-        <div className="tile-gold inline-block px-6 py-3 mb-4">
-          <div className="text-[10px] uppercase tracking-wider opacity-80">Level Score</div>
-          <div className="display text-3xl font-bold tabular-nums">
-            {result.score.toLocaleString()}
-          </div>
-        </div>
-
-        <div className="mb-7">
+        <div className="mb-2">
           <div className="text-[9px] uppercase tracking-[0.25em] text-muted-foreground mb-1">
-            Career Total
+            Session Score
           </div>
           <div
             className="display font-bold tabular-nums text-primary"
             style={{
-              fontSize: "clamp(2rem, 10vw, 3.5rem)",
+              fontSize: "clamp(2.2rem, 11vw, 4rem)",
               textShadow: "0 0 40px oklch(0.85 0.20 75 / 0.6)",
             }}
           >
-            {result.careerTotal.toLocaleString()}
+            {result.sessionTotal.toLocaleString()}
           </div>
+        </div>
+
+        <div className="tile-gold inline-block px-5 py-2 mb-7 opacity-80">
+          <div className="text-[9px] uppercase tracking-wider opacity-70">+{result.score.toLocaleString()} this level · career {result.careerTotal.toLocaleString()}</div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
