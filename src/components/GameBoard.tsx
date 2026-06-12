@@ -13,6 +13,7 @@ import {
 } from "@/lib/game/engine";
 import { SunPiece } from "./SunPiece";
 import { SUN_AURA, SUN_IMAGES } from "@/lib/game/art";
+import { playMatch, playSwap, playLevelComplete } from "@/lib/game/audio";
 
 const SWAP_MS = 180;
 const POP_MS = 380;
@@ -96,6 +97,7 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
       completedRef.current = true;
       const stars = score >= targetThree ? 3 : score >= targetThree * 0.6 ? 2 : score >= targetThree * 0.35 ? 1 : 0;
       console.log(`[SOL] GameBoard out-of-moves — score:${score} target:${targetThree} stars:${stars}`);
+      playLevelComplete();
       setTimeout(() => onComplete({ score, stars, cleared: stars >= 1 }), 350);
     }
   }, [moves, score, busy, targetThree, onComplete]);
@@ -147,6 +149,7 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
       }
 
       setMoves((m) => m - 1);
+      playSwap();
 
       let chain = 0;
       let chainScore = 0;
@@ -155,6 +158,7 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
         const step = resolveStep(curr, pivot);
         if (!step.hadMatch) break;
         chain++;
+        playMatch(chain);
         pivot = undefined;
 
         const exits: ExitingCell[] = step.cleared.map(({ pos, cell }) => ({
@@ -203,6 +207,7 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
       if (!completedRef.current && score + chainScore >= targetThree && moves - 1 > 0) {
         completedRef.current = true;
         console.log(`[SOL] GameBoard early-victory — score:${score + chainScore} movesLeft:${moves - 1}`);
+        playLevelComplete();
         setTimeout(
           () => onComplete({ score: score + chainScore, stars: 3, cleared: true }),
           400,
