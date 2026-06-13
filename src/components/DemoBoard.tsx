@@ -9,6 +9,9 @@ import {
   resolveStep,
   swap,
 } from "@/lib/game/engine";
+
+// Show only a 5×5 window of the 8×8 board — bigger pieces, clearer demo
+const DEMO_SIZE = 5;
 import { SUN_AURA, SUN_IMAGES } from "@/lib/game/art";
 
 const SWAP_MS = 220;
@@ -38,7 +41,7 @@ export function DemoBoard() {
   useEffect(() => {
     if (!boardRef.current) return;
     const ro = new ResizeObserver((e) => {
-      setCellPx(Math.floor(e[0].contentRect.width / SIZE));
+      setCellPx(Math.floor(e[0].contentRect.width / DEMO_SIZE));
     });
     ro.observe(boardRef.current);
     return () => ro.disconnect();
@@ -118,15 +121,20 @@ export function DemoBoard() {
 
   const flatCells = useMemo(() => {
     const out: { cell: Cell; r: number; c: number }[] = [];
-    for (let r = 0; r < SIZE; r++)
-      for (let c = 0; c < SIZE; c++) {
+    for (let r = 0; r < DEMO_SIZE; r++)
+      for (let c = 0; c < DEMO_SIZE; c++) {
         const cell = board[r][c];
         if (cell) out.push({ cell, r, c });
       }
     return out;
   }, [board]);
 
-  const boardPx = cellPx * SIZE;
+  // Only show exiting cells within the demo window
+  const visibleExiting = exiting.filter(
+    (e) => e.pos[0] < DEMO_SIZE && e.pos[1] < DEMO_SIZE,
+  );
+
+  const boardPx = cellPx * DEMO_SIZE;
 
   return (
     <div className="w-full max-w-sm mx-auto px-3 relative">
@@ -176,7 +184,7 @@ export function DemoBoard() {
             );
           })}
 
-          {exiting.map((e) => (
+          {visibleExiting.map((e) => (
             <div
               key={`x-${e.uid}`}
               className="absolute pointer-events-none"
