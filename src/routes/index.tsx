@@ -113,6 +113,12 @@ function Title() {
         <div className="text-[10px] tracking-[0.3em] uppercase text-cream/50">
           A handcrafted Match-3 experience
         </div>
+        <Link
+          to="/privacy"
+          className="mt-3 text-[9px] tracking-[0.2em] uppercase text-cream/30 hover:text-cream/60 transition-colors"
+        >
+          Privacy Policy
+        </Link>
       </div>
     </main>
   );

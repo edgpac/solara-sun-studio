@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayLevelRouteImport } from './routes/play.$level'
 
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapRoute = MapRouteImport.update({
   id: '/map',
   path: '/map',
@@ -32,35 +38,46 @@ const PlayLevelRoute = PlayLevelRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/map': typeof MapRoute
+  '/privacy': typeof PrivacyRoute
   '/play/$level': typeof PlayLevelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/map': typeof MapRoute
+  '/privacy': typeof PrivacyRoute
   '/play/$level': typeof PlayLevelRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/map': typeof MapRoute
+  '/privacy': typeof PrivacyRoute
   '/play/$level': typeof PlayLevelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/map' | '/play/$level'
+  fullPaths: '/' | '/map' | '/privacy' | '/play/$level'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/map' | '/play/$level'
-  id: '__root__' | '/' | '/map' | '/play/$level'
+  to: '/' | '/map' | '/privacy' | '/play/$level'
+  id: '__root__' | '/' | '/map' | '/privacy' | '/play/$level'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MapRoute: typeof MapRoute
+  PrivacyRoute: typeof PrivacyRoute
   PlayLevelRoute: typeof PlayLevelRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/map': {
       id: '/map'
       path: '/map'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MapRoute: MapRoute,
+  PrivacyRoute: PrivacyRoute,
   PlayLevelRoute: PlayLevelRoute,
 }
 export const routeTree = rootRouteImport
