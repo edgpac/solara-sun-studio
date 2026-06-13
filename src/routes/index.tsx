@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import goldenSun from "@/assets/sun-golden.png";
 import { loadProgress } from "@/lib/game/storage";
+import { getChampion, type Champion } from "@/lib/api/topScore.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,8 +25,11 @@ export const Route = createFileRoute("/")({
 
 function Title() {
   const [careerTotal, setCareerTotal] = useState(0);
+  const [champion, setChampion] = useState<Champion | null>(null);
+
   useEffect(() => {
     setCareerTotal(loadProgress().careerTotal);
+    getChampion().then(setChampion).catch(() => null);
   }, []);
 
   return (
@@ -68,10 +72,10 @@ function Title() {
           Match the Suns. Awaken the Light.
         </p>
 
-        {careerTotal > 0 && (
-          <div className="mb-8 text-center">
+        {champion && (
+          <div className="mb-3 text-center">
             <div className="text-[9px] uppercase tracking-[0.3em] text-cream/50 mb-1">
-              Career Score
+              👑 World Champion
             </div>
             <div
               className="display font-bold tabular-nums"
@@ -80,9 +84,20 @@ function Title() {
                 background: "linear-gradient(180deg, oklch(0.96 0.12 85), oklch(0.7 0.20 50))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                textShadow: "0 0 40px oklch(0.78 0.20 65 / 0.4)",
+                textShadow: "0 0 40px oklch(0.78 0.20 65 / 0.5)",
               }}
             >
+              {champion.initials} — {champion.score.toLocaleString()}
+            </div>
+          </div>
+        )}
+
+        {careerTotal > 0 && (
+          <div className="mb-8 text-center">
+            <div className="text-[9px] uppercase tracking-[0.3em] text-cream/40 mb-1">
+              Your Career Score
+            </div>
+            <div className="display text-xl font-bold tabular-nums text-cream/60">
               {careerTotal.toLocaleString()}
             </div>
           </div>
