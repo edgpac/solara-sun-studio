@@ -37,43 +37,43 @@ function Title() {
   return (
     <main className="scene-cabo min-h-screen w-full flex flex-col items-center justify-center px-6 py-12 relative">
       <div className="relative z-10 flex flex-col items-center text-center max-w-2xl">
-        {/* Mask — smaller so Play button stays above the fold */}
-        <div className="relative mb-1">
-          <div
-            className="absolute inset-0 -m-8 rounded-full blur-3xl opacity-60"
-            style={{
-              background:
-                "radial-gradient(circle, oklch(0.95 0.18 85 / 0.7), oklch(0.78 0.20 65 / 0.3) 50%, transparent 70%)",
-            }}
-          />
-          <img
-            src={goldenSun}
-            alt="Golden Talavera Sun"
-            width={280}
-            height={280}
-            className="relative w-[140px] sm:w-[200px] md:w-[280px] drop-shadow-[0_20px_40px_oklch(0_0_0/0.6)]"
-            style={{ animation: "sun-breathe 6s ease-in-out infinite" }}
-          />
-        </div>
-
-        <div className="display text-[10px] sm:text-xs tracking-[0.5em] uppercase text-cream/80 mb-1">
-          Cabo San Lucas · México
-        </div>
-        <h1
-          className="display font-bold leading-[0.9] mb-2"
+        {/* Compact header capsule */}
+        <div
+          className="flex items-center gap-4 px-5 py-3 rounded-full mb-6"
           style={{
-            fontSize: "clamp(2.6rem, 11vw, 6rem)",
-            background: "linear-gradient(180deg, oklch(0.96 0.12 85), oklch(0.7 0.20 50))",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            textShadow: "0 4px 30px oklch(0.78 0.20 65 / 0.4)",
+            background: "oklch(0.12 0.04 30 / 0.55)",
+            border: "1px solid oklch(0.78 0.18 65 / 0.3)",
+            backdropFilter: "blur(12px)",
           }}
         >
-          SOL <span className="italic font-normal">de</span> CABO
-        </h1>
-        <p className="display italic text-base sm:text-lg text-cream/90 mb-5 max-w-md">
-          Match the Suns. Awaken the Light.
-        </p>
+          <img
+            src={goldenSun}
+            alt="Sol de Cabo"
+            width={64}
+            height={64}
+            className="w-12 h-12 sm:w-16 sm:h-16 drop-shadow-[0_4px_12px_oklch(0_0_0/0.5)] flex-shrink-0"
+            style={{ animation: "sun-breathe 6s ease-in-out infinite" }}
+          />
+          <div className="text-left">
+            <div className="text-[9px] uppercase tracking-[0.4em] text-cream/60 leading-none mb-1">
+              Cabo San Lucas · México
+            </div>
+            <div
+              className="display font-bold leading-none"
+              style={{
+                fontSize: "clamp(1.6rem, 7vw, 2.8rem)",
+                background: "linear-gradient(180deg, oklch(0.96 0.12 85), oklch(0.7 0.20 50))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              SOL <span className="italic font-normal">de</span> CABO
+            </div>
+            <div className="display italic text-sm text-cream/70 mt-0.5">
+              Match the Suns. Awaken the Light.
+            </div>
+          </div>
+        </div>
 
         {/* Play button — above the fold on every phone */}
         <div className="flex flex-col gap-3 w-full max-w-xs mb-6">
