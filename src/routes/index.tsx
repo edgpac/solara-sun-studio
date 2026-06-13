@@ -59,9 +59,9 @@ function Title() {
               Cabo San Lucas · México
             </div>
             <div
-              className="display font-bold leading-none"
+              className="display font-bold leading-none whitespace-nowrap"
               style={{
-                fontSize: "clamp(1.6rem, 7vw, 2.4rem)",
+                fontSize: "clamp(1.15rem, 5.5vw, 1.75rem)",
                 background: "linear-gradient(180deg, oklch(0.96 0.12 85), oklch(0.7 0.20 50))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
@@ -72,7 +72,7 @@ function Title() {
             <div className="display italic text-xs text-cream/70 mt-0.5 mb-2">
               Match the Suns. Awaken the Light.
             </div>
-            {champion && (
+            {champion ? (
               <div
                 className="text-[10px] font-semibold tracking-wide tabular-nums"
                 style={{
@@ -83,7 +83,18 @@ function Title() {
               >
                 👑 {champion.initials} — {champion.score.toLocaleString()}
               </div>
-            )}
+            ) : careerTotal > 0 ? (
+              <div
+                className="text-[10px] font-semibold tracking-wide tabular-nums"
+                style={{
+                  background: "linear-gradient(90deg, oklch(0.96 0.12 85), oklch(0.78 0.20 65))",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Your score: {careerTotal.toLocaleString()}
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -94,16 +105,6 @@ function Title() {
           Play
         </Link>
 
-        {careerTotal > 0 && (
-          <div className="mb-5 text-center">
-            <div className="text-[9px] uppercase tracking-[0.3em] text-cream/40 mb-1">
-              Your Career Score
-            </div>
-            <div className="display text-xl font-bold tabular-nums text-cream/60">
-              {careerTotal.toLocaleString()}
-            </div>
-          </div>
-        )}
 
         <div className="w-full mb-6">
           <DemoBoard />
