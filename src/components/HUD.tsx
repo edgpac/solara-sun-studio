@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { isSoundEnabled, toggleSound } from "@/lib/game/audio";
+
 interface Props {
   level: number;
   region: string;
@@ -14,6 +17,13 @@ interface Props {
 
 export function HUD({ level, region, name, score, sessionScore, targetThree, moves, combo, onPause }: Props) {
   const progress = Math.min(100, (score / targetThree) * 100);
+  const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
+
+  function handleSoundToggle() {
+    const next = toggleSound();
+    setSoundOn(next);
+  }
+
   return (
     <div className="w-full max-w-2xl mx-auto px-4 pt-4">
       <div className="flex items-center justify-between gap-3 mb-3">
@@ -30,6 +40,13 @@ export function HUD({ level, region, name, score, sessionScore, targetThree, mov
           </div>
           <div className="display text-xl sm:text-2xl truncate text-primary">{name}</div>
         </div>
+        <button
+          onClick={handleSoundToggle}
+          className="tile px-3 py-2 text-lg hover:scale-105 transition-transform"
+          aria-label={soundOn ? "Mute sound" : "Unmute sound"}
+        >
+          {soundOn ? "🔊" : "🔇"}
+        </button>
         <div className="tile px-3 py-2 min-w-[72px] text-center">
           <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Moves</div>
           <div className="display text-2xl font-bold leading-none">{moves}</div>

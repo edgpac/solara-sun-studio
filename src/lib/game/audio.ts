@@ -1,10 +1,24 @@
 // Synthesized sound effects — marimba-style hits, no audio files needed.
 // SSR-safe: AudioContext only lives in the browser.
 
+const SOUND_KEY = "sol:sound";
+
+export function isSoundEnabled(): boolean {
+  if (typeof window === "undefined") return true;
+  return localStorage.getItem(SOUND_KEY) !== "off";
+}
+
+export function toggleSound(): boolean {
+  const next = !isSoundEnabled();
+  if (typeof window !== "undefined") localStorage.setItem(SOUND_KEY, next ? "on" : "off");
+  return next;
+}
+
 let ctx: AudioContext | null = null;
 
 function ac(): AudioContext | null {
   if (typeof window === "undefined") return null;
+  if (!isSoundEnabled()) return null;
   try {
     if (!ctx) ctx = new AudioContext();
     if (ctx.state === "suspended") void ctx.resume();
