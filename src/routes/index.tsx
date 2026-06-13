@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import goldenSun from "@/assets/sun-golden.png";
 import { loadProgress } from "@/lib/game/storage";
 import { getChampion, type Champion } from "@/lib/api/topScore.functions";
+import { DemoBoard } from "@/components/DemoBoard";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -71,6 +73,10 @@ function Title() {
         <p className="display italic text-lg sm:text-xl text-cream/90 mb-6 max-w-md">
           Match the Suns. Awaken the Light.
         </p>
+
+        <div className="w-full mb-6">
+          <DemoBoard />
+        </div>
 
         {champion && (
           <div className="mb-3 text-center">
