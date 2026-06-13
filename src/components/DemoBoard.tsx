@@ -14,9 +14,9 @@ import {
 const DEMO_SIZE = 5;
 import { SUN_AURA, SUN_IMAGES } from "@/lib/game/art";
 
-const SWAP_MS = 220;
-const POP_MS = 380;
-const MOVE_INTERVAL = 1600;
+const SWAP_MS = 120;
+const POP_MS = 200;
+const MOVE_INTERVAL = 700;
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
