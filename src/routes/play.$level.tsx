@@ -164,8 +164,7 @@ function Session({
         adUsed={adUsed}
         watchingAd={watchingAd}
         onMap={navigateBack}
-        hintsOn={hintsOn}
-        onHint={() => setHintsOn((h) => !h)}
+        onHintsChange={setHintsOn}
         onShuffle={() => setShuffleSignal((n) => n + 1)}
         onWatchAd={handleWatchAd}
       />

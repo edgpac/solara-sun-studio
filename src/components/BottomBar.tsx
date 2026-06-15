@@ -1,10 +1,11 @@
+import { useState } from "react";
+
 interface Props {
   moves: number;
   adUsed: boolean;
   watchingAd: boolean;
-  hintsOn: boolean;
   onMap: () => void;
-  onHint: () => void;
+  onHintsChange: (on: boolean) => void;
   onShuffle: () => void;
   onWatchAd: () => void;
 }
@@ -63,8 +64,15 @@ function Booster({
   );
 }
 
-export function BottomBar({ moves, adUsed, watchingAd, hintsOn, onMap, onHint, onShuffle, onWatchAd }: Props) {
+export function BottomBar({ moves, adUsed, watchingAd, onMap, onHintsChange, onShuffle, onWatchAd }: Props) {
+  const [hintsOn, setHintsOn] = useState(false);
   const showAd = moves <= 10 && !adUsed;
+
+  function handleHintToggle() {
+    const next = !hintsOn;
+    setHintsOn(next);
+    onHintsChange(next);
+  }
 
   return (
     <div
@@ -77,7 +85,7 @@ export function BottomBar({ moves, adUsed, watchingAd, hintsOn, onMap, onHint, o
       }}
     >
       <Booster icon="🗺" label="Map"     onClick={onMap} />
-      <Booster icon="💡" label={hintsOn ? "Hints On" : "Hints Off"} onClick={onHint} accent={hintsOn ? "gold" : undefined} />
+      <Booster icon="💡" label={hintsOn ? "Hints On" : "Hints Off"} onClick={handleHintToggle} accent={hintsOn ? "gold" : undefined} />
       <Booster icon="🔀" label="Shuffle" onClick={onShuffle} />
       <Booster
         icon={watchingAd ? "⏳" : "📺"}
