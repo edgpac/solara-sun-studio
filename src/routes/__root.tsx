@@ -7,7 +7,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
+import { initAdMob } from "@/lib/admob";
 
 import appCss from "../styles.css?url";
 
@@ -106,6 +107,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    void initAdMob();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

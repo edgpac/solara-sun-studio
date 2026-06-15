@@ -55,7 +55,7 @@ function MapPage() {
   const stars = totalStars(progress);
 
   return (
-    <main className="scene-cabo min-h-screen w-full px-4 sm:px-6 py-8 relative">
+    <main className="scene-cabo min-h-screen w-full px-4 sm:px-6 relative" style={{ paddingTop: "calc(var(--sat, env(safe-area-inset-top, 0px)) + 2rem)", paddingBottom: "calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 2rem)" }}>
       <div className="relative z-10 max-w-3xl mx-auto">
         <header className="flex items-center justify-between mb-8 gap-4">
           <Link
@@ -114,6 +114,7 @@ function MapPage() {
                     earned={earned}
                     unlocked={unlocked}
                     sunImg={sunImg}
+                    nameColor={lv.color}
                   />
                 </li>
               );
@@ -137,6 +138,7 @@ function LevelPin({
   earned,
   unlocked,
   sunImg,
+  nameColor,
 }: {
   levelId: number;
   name: string;
@@ -145,63 +147,101 @@ function LevelPin({
   earned: number;
   unlocked: boolean;
   sunImg: string;
+  nameColor: string;
 }) {
   const content = (
     <div
-      className={[
-        "tile map-pin flex items-center gap-4 p-3 sm:p-4 relative",
-        unlocked ? "" : "opacity-50 grayscale",
-      ].join(" ")}
+      className={["map-pin relative overflow-hidden", unlocked ? "" : "opacity-45 grayscale"].join(" ")}
+      style={{
+        background: `linear-gradient(135deg, oklch(0.22 0.09 276) 0%, oklch(0.16 0.07 272) 100%)`,
+        border: `2px solid ${unlocked ? nameColor + "88" : "oklch(0.30 0.06 270)"}`,
+        borderRadius: "1.25rem",
+        boxShadow: unlocked
+          ? `inset 0 1px 0 oklch(0.55 0.12 280 / 0.3), 0 5px 0 oklch(0.10 0.04 270), 0 10px 28px oklch(0 0 0 / 0.65), 0 0 40px ${nameColor}22`
+          : "0 4px 0 oklch(0.10 0.04 270), 0 8px 20px oklch(0 0 0 / 0.5)",
+      }}
     >
-      <div className="relative shrink-0">
+      {/* Subtle color wash from nameColor */}
+      {unlocked && (
         <div
-          className="absolute inset-0 -m-2 rounded-full blur-xl"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            background: unlocked
-              ? "radial-gradient(circle, oklch(0.85 0.20 75 / 0.6), transparent 70%)"
-              : "transparent",
+            background: `radial-gradient(ellipse 80% 60% at 100% 50%, ${nameColor}18, transparent 70%)`,
           }}
         />
-        <img
-          src={sunImg}
-          alt=""
-          width={88}
-          height={88}
-          loading="lazy"
-          className="relative w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_4px_8px_oklch(0_0_0/0.5)]"
-        />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-          Level {levelId} · {region}
-        </div>
-        <div className="display text-xl sm:text-2xl font-semibold text-primary truncate">
-          {name}
-        </div>
-        <div className="text-xs italic text-cream/70 truncate">{vibe}</div>
-        <div className="flex gap-1 mt-1.5" aria-label={`${earned} of 3 stars`}>
-          {[1, 2, 3].map((s) => (
-            <span
-              key={s}
-              className={
-                s <= earned ? "text-primary text-lg leading-none" : "text-muted text-lg leading-none"
-              }
-              style={
-                s <= earned
-                  ? { textShadow: "0 0 8px oklch(0.85 0.20 75 / 0.8)" }
-                  : undefined
-              }
-            >
-              ★
-            </span>
-          ))}
-        </div>
-      </div>
-      {!unlocked && (
-        <div className="display text-3xl text-muted-foreground/60" aria-hidden>
-          ✦
-        </div>
       )}
+      <div className="relative flex items-center gap-4 p-3 sm:p-4">
+        {/* Sun art with glow */}
+        <div className="relative shrink-0">
+          {unlocked && (
+            <div
+              className="absolute inset-0 rounded-full blur-2xl"
+              style={{ background: `radial-gradient(circle, ${nameColor}55, transparent 70%)`, transform: "scale(1.4)" }}
+            />
+          )}
+          <img
+            src={sunImg}
+            alt=""
+            width={88}
+            height={88}
+            loading="lazy"
+            className="relative w-16 h-16 sm:w-20 sm:h-20 object-contain"
+            style={{ filter: "drop-shadow(0 4px 12px oklch(0 0 0 / 0.6))" }}
+          />
+        </div>
+
+        {/* Level info */}
+        <div className="flex-1 min-w-0">
+          <div className="text-[9px] uppercase tracking-[0.22em]" style={{ color: "oklch(0.55 0.08 280)" }}>
+            Level {levelId} · {region}
+          </div>
+          <div
+            className="display text-xl sm:text-2xl font-bold truncate leading-tight"
+            style={{
+              color: unlocked ? nameColor : "oklch(0.45 0.06 270)",
+              textShadow: unlocked ? `0 0 20px ${nameColor}88, 0 2px 4px oklch(0 0 0 / 0.6)` : "none",
+            }}
+          >
+            {name}
+          </div>
+          <div className="text-xs italic mb-1.5" style={{ color: "oklch(0.62 0.06 280)" }}>{vibe}</div>
+
+          {/* Stars */}
+          <div className="flex gap-1" aria-label={`${earned} of 3 stars`}>
+            {[1, 2, 3].map((s) => (
+              <span
+                key={s}
+                style={{
+                  fontSize: "1.15rem",
+                  lineHeight: 1,
+                  color: s <= earned ? "oklch(0.90 0.22 80)" : "oklch(0.28 0.06 270)",
+                  filter: s <= earned ? "drop-shadow(0 0 6px oklch(0.88 0.22 80 / 0.9))" : "none",
+                }}
+              >★</span>
+            ))}
+            {earned === 3 && (
+              <span className="text-[9px] uppercase tracking-widest ml-1.5" style={{ color: "oklch(0.75 0.16 72)" }}>
+                Complete
+              </span>
+            )}
+          </div>
+        </div>
+
+        {!unlocked ? (
+          <div className="text-4xl" aria-hidden style={{ color: "oklch(0.35 0.06 270)" }}>🔒</div>
+        ) : unlocked && earned === 0 ? (
+          <div
+            className="flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+            style={{
+              background: "linear-gradient(180deg, oklch(0.88 0.20 82), oklch(0.68 0.24 56))",
+              color: "oklch(0.14 0.04 35)",
+              boxShadow: "0 3px 0 oklch(0.42 0.18 40), 0 6px 12px oklch(0 0 0 / 0.4)",
+            }}
+          >
+            Play
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 

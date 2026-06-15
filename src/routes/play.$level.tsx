@@ -2,10 +2,14 @@ import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-r
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { HUD } from "@/components/HUD";
+import { BottomBar } from "@/components/BottomBar";
 import { getLevel, type Level } from "@/lib/game/levels";
 import { saveLevelResult, addToCareerTotal } from "@/lib/game/storage";
 import { getSessionBase, advanceSession } from "@/lib/game/sessionScore";
 import { getChampion, submitScore, type Champion } from "@/lib/api/topScore.functions";
+import { submitTournamentScore } from "@/lib/api/tournament.functions";
+import { INITIALS_KEY, UID_KEY } from "@/components/TournamentBanner";
+import { showRewardedAd } from "@/lib/admob";
 
 export const Route = createFileRoute("/play/$level")({
   head: ({ params }) => ({
@@ -84,24 +88,53 @@ function Session({
   const [stats, setStats] = useState({ score: 0, moves: level.moves, combo: 0 });
   const [done, setDone] = useState<CompletionState | null>(null);
   const [seed, setSeed] = useState(0);
+  const [bonusMoves, setBonusMoves] = useState(0);
+  const [hintSignal, setHintSignal] = useState(0);
+  const [shuffleSignal, setShuffleSignal] = useState(0);
+  const [adUsed, setAdUsed] = useState(false);
+  const [watchingAd, setWatchingAd] = useState(false);
+  const [savedInitials] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem(INITIALS_KEY) ?? "";
+  });
+  const [savedUid] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    let uid = localStorage.getItem(UID_KEY);
+    if (!uid) { uid = crypto.randomUUID(); localStorage.setItem(UID_KEY, uid); }
+    return uid;
+  });
 
   const handleComplete = useCallback(
     (r: { score: number; stars: number; cleared: boolean }) => {
-      console.log(`[SOL] level ${level.id} complete — stars:${r.stars} score:${r.score} cleared:${r.cleared}`);
       saveLevelResult(level.id, r.stars, r.score);
       advanceSession(r.score);
       const { careerTotal } = addToCareerTotal(r.score);
-      setDone({ ...r, sessionTotal: sessionBase + r.score, careerTotal });
+      const sessionTotal = sessionBase + r.score;
+      setDone({ ...r, sessionTotal, careerTotal });
+      if (savedInitials && savedUid) {
+        submitTournamentScore({ data: { score: sessionTotal, uid: savedUid, initials: savedInitials } })
+          .catch(() => null);
+      }
     },
-    [level.id, sessionBase],
+    [level.id, sessionBase, savedInitials, savedUid],
   );
 
   const nextLevel = getLevel(level.id + 1);
-  console.log(`[SOL] Session mounted — level:${level.id} nextLevel:${nextLevel.id} moves:${level.moves}`);
+
+  const handleWatchAd = async () => {
+    setWatchingAd(true);
+    setAdUsed(true);
+    const earned = await showRewardedAd();
+    if (earned) {
+      setDone(null);
+      setBonusMoves((b) => b + 3);
+    }
+    setWatchingAd(false);
+  };
 
   return (
-    <main className="scene-cabo min-h-screen w-full pb-10 relative">
-      <div className="relative z-10">
+    <main className="scene-cabo h-screen w-full flex flex-col overflow-hidden relative" style={{ paddingTop: "calc(var(--sat, env(safe-area-inset-top, 0px)) + 4rem)" }}>
+      <div className="relative z-10 flex flex-col flex-1 overflow-hidden">
         <HUD
           level={level.id}
           region={level.region}
@@ -111,31 +144,51 @@ function Session({
           targetThree={level.stars[2]}
           moves={stats.moves}
           combo={stats.combo}
-          onPause={navigateBack}
         />
-        <GameBoard
-          key={seed}
-          moves={level.moves}
-          targetThree={level.stars[2]}
-          onStats={setStats}
-          onComplete={handleComplete}
-        />
+        <div className="flex-1 flex items-center justify-center overflow-hidden">
+          <GameBoard
+            key={seed}
+            moves={level.moves}
+            targetThree={level.stars[2]}
+            bonusMoves={bonusMoves}
+            hintSignal={hintSignal}
+            shuffleSignal={shuffleSignal}
+            onStats={setStats}
+            onComplete={handleComplete}
+          />
+        </div>
       </div>
+
+      <BottomBar
+        moves={stats.moves}
+        adUsed={adUsed}
+        watchingAd={watchingAd}
+        onMap={navigateBack}
+        onHint={() => setHintSignal((n) => n + 1)}
+        onShuffle={() => setShuffleSignal((n) => n + 1)}
+        onWatchAd={handleWatchAd}
+      />
 
       {done && (
         <CompletionOverlay
           level={level}
           result={done}
+          onInitialsSaved={(inits) => {
+            submitTournamentScore({ data: { score: done.sessionTotal, uid: savedUid, initials: inits } })
+              .catch(() => null);
+          }}
+          onWatchAd={handleWatchAd}
           onReplay={() => {
             setDone(null);
+            setAdUsed(false);
             setStats({ score: 0, moves: level.moves, combo: 0 });
             setSeed((s) => s + 1);
           }}
           onNext={
             nextLevel
               ? () => {
-                  console.log(`[SOL] Next clicked — navigating to level ${nextLevel.id}`);
                   setDone(null);
+                  setAdUsed(false);
                   navigate({ to: "/play/$level", params: { level: String(nextLevel.id) } });
                 }
               : undefined
@@ -150,12 +203,16 @@ function Session({
 function CompletionOverlay({
   level,
   result,
+  onInitialsSaved,
+  onWatchAd,
   onReplay,
   onNext,
   onMap,
 }: {
   level: Level;
   result: CompletionState;
+  onInitialsSaved: (initials: string) => void;
+  onWatchAd: () => Promise<void>;
   onReplay: () => void;
   onNext?: () => void;
   onMap: () => void;
@@ -167,7 +224,13 @@ function CompletionOverlay({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    getChampion().then(setChampion).catch(() => null);
+    getChampion()
+      .then((c) => {
+        if (c && typeof c.score === "number" && typeof c.initials === "string") {
+          setChampion(c);
+        }
+      })
+      .catch(() => null);
   }, []);
 
   const isNewRecord = champion === null || result.sessionTotal > champion.score;
@@ -180,10 +243,15 @@ function CompletionOverlay({
   async function handleSubmitInitials() {
     if (!initials.trim()) return;
     setSubmitting(true);
+    const normalized = initials.trim().toUpperCase().slice(0, 3);
     try {
-      const res = await submitScore({ data: { score: result.sessionTotal, initials: initials.trim() } });
-      setChampion(res.champion);
+      const res = await submitScore({ data: { score: result.sessionTotal, initials: normalized } });
+      if (res?.champion && typeof res.champion.score === "number" && typeof res.champion.initials === "string") {
+        setChampion(res.champion);
+      }
       setSubmitted(true);
+      localStorage.setItem(INITIALS_KEY, normalized);
+      onInitialsSaved(normalized);
     } catch {
       setSubmitted(true);
     } finally {
@@ -269,6 +337,21 @@ function CompletionOverlay({
           <div className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground/50 mb-5">
             Champion: {champion.initials} — {champion.score.toLocaleString()}
           </div>
+        )}
+
+        {/* Rewarded ad — out of moves only */}
+        {!result.cleared && (
+          <button
+            onClick={() => void onWatchAd()}
+            className="w-full py-3 mb-4 text-sm font-bold uppercase tracking-wider rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(135deg, oklch(0.52 0.20 240), oklch(0.65 0.22 230))",
+              color: "oklch(0.96 0.04 230)",
+              boxShadow: "0 0 24px oklch(0.52 0.20 240 / 0.4)",
+            }}
+          >
+            📺 Watch Ad for +3 Moves
+          </button>
         )}
 
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">

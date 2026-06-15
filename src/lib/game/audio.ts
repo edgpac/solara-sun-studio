@@ -105,6 +105,47 @@ export function playSwap(): void {
   marimbaHit(c, 280, 0.07, now);
 }
 
+/** Fired when a special piece (beam/bomb/eclipse) activates. */
+export function playSpecial(type: "beam-h" | "beam-v" | "bomb" | "eclipse"): void {
+  const c = ac();
+  if (!c) return;
+  const now = c.currentTime;
+
+  if (type === "bomb") {
+    // Deep sawtooth thud that drops in pitch
+    const osc = c.createOscillator();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(130, now);
+    osc.frequency.exponentialRampToValueAtTime(38, now + 0.35);
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.35, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    osc.connect(g);
+    g.connect(c.destination);
+    osc.start(now);
+    osc.stop(now + 0.5);
+  } else if (type === "beam-h" || type === "beam-v") {
+    // Sine sweep — horizontal rises, vertical falls
+    const osc = c.createOscillator();
+    osc.type = "sine";
+    const [from, to] = type === "beam-h" ? [250, 800] : [800, 250];
+    osc.frequency.setValueAtTime(from, now);
+    osc.frequency.exponentialRampToValueAtTime(to, now + 0.28);
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.2, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(g);
+    g.connect(c.destination);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  } else {
+    // Eclipse — full chromatic shimmer across all 6 colors
+    for (let i = 0; i < 7; i++) {
+      marimbaHit(c, NOTES[i + 1], 0.14, now + i * 0.045);
+    }
+  }
+}
+
 /** Ascending shimmer across five notes when a level is completed. */
 export function playLevelComplete(): void {
   const c = ac();

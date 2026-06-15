@@ -19,7 +19,7 @@ function SunPieceBase({ cell, selected, hint }: Props) {
         "sun-piece",
         selected && "is-selected",
         hint && "is-hint",
-        special && "is-special",
+        special && `is-special is-special-${cell.special}`,
       ]
         .filter(Boolean)
         .join(" ")}
@@ -72,26 +72,56 @@ function SunPieceBase({ cell, selected, hint }: Props) {
 }
 
 function SpecialBadge({ type }: { type: Cell["special"] }) {
-  // Subtle glyph stamped on top of the ceramic sun to mark a special piece.
-  const label =
-    type === "beam-h" ? "↔" : type === "beam-v" ? "↕" : type === "bomb" ? "✸" : "◉";
+  if (type === "none") return null;
+
+  const label = type === "beam-h" ? "↔" : type === "beam-v" ? "↕" : type === "bomb" ? "✸" : "◉";
+
+  // Each special gets a distinct color so players learn to recognize them at a glance.
+  const [glowColor, textColor] =
+    type === "bomb"
+      ? ["oklch(0.80 0.25 25)", "oklch(1 0.20 30)"]       // red-orange
+      : type === "eclipse"
+      ? ["oklch(0.80 0.22 300)", "oklch(0.95 0.16 300)"]   // violet
+      : ["oklch(0.80 0.22 230)", "oklch(0.95 0.20 220)"];  // electric blue (beams)
+
   return (
-    <div
-      className="absolute inset-0 grid place-items-center pointer-events-none"
-      aria-hidden
-    >
-      <div
-        className="display"
-        style={{
-          fontSize: "1.6em",
-          fontWeight: 700,
-          color: "var(--cream)",
-          textShadow:
-            "0 0 14px oklch(0.95 0.18 85 / 0.9), 0 2px 4px oklch(0 0 0 / 0.6)",
-          mixBlendMode: "screen",
-        }}
-      >
-        {label}
+    <div className="absolute inset-0 pointer-events-none" aria-hidden>
+      {/* Directional streak overlay makes beam orientation obvious */}
+      {type === "beam-h" && (
+        <div
+          className="absolute inset-x-0"
+          style={{
+            height: "26%",
+            top: "37%",
+            background: `linear-gradient(90deg, transparent 8%, ${glowColor.replace(")", " / 0.45)")} 40%, ${glowColor.replace(")", " / 0.45)")} 60%, transparent 92%)`,
+            borderRadius: "3px",
+          }}
+        />
+      )}
+      {type === "beam-v" && (
+        <div
+          className="absolute inset-y-0"
+          style={{
+            width: "26%",
+            left: "37%",
+            background: `linear-gradient(180deg, transparent 8%, ${glowColor.replace(")", " / 0.45)")} 40%, ${glowColor.replace(")", " / 0.45)")} 60%, transparent 92%)`,
+            borderRadius: "3px",
+          }}
+        />
+      )}
+      <div className="absolute inset-0 grid place-items-center">
+        <div
+          className="display"
+          style={{
+            fontSize: "1.5em",
+            fontWeight: 700,
+            color: textColor,
+            textShadow: `0 0 12px ${glowColor}, 0 2px 4px oklch(0 0 0 / 0.6)`,
+            mixBlendMode: "screen",
+          }}
+        >
+          {label}
+        </div>
       </div>
     </div>
   );

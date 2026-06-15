@@ -110,9 +110,14 @@ export interface StepResult {
 
 const key = (r: number, c: number) => `${r},${c}`;
 
-export function resolveStep(b: Board, swapPoint?: Pos): StepResult {
+export function resolveStep(b: Board, swapPoint?: Pos, forceTrigger?: Pos[]): StepResult {
   const matches = findMatches(b);
-  if (matches.length === 0) {
+  const hasForced = forceTrigger?.some(([r, c]) => {
+    const cell = b[r][c];
+    return cell !== null && cell.special !== "none";
+  });
+
+  if (matches.length === 0 && !hasForced) {
     return { board: b, cleared: [], scored: 0, hadMatch: false };
   }
 
@@ -160,6 +165,19 @@ export function resolveStep(b: Board, swapPoint?: Pos): StepResult {
       if (!toClear.has(k)) {
         toClear.add(k);
         queue.push(p);
+      }
+    }
+  }
+  // Direct swap of a special piece — force it into the BFS queue even with no normal match.
+  if (forceTrigger) {
+    for (const p of forceTrigger) {
+      const cell = b[p[0]][p[1]];
+      if (cell && cell.special !== "none") {
+        const k = key(p[0], p[1]);
+        if (!toClear.has(k)) {
+          toClear.add(k);
+          queue.push(p);
+        }
       }
     }
   }
@@ -223,7 +241,7 @@ export function resolveStep(b: Board, swapPoint?: Pos): StepResult {
   }
 
   const scored = cleared.length * 30 + (spawned ? 120 : 0);
-  return { board: nb, cleared, scored, hadMatch: true, spawned };
+  return { board: nb, cleared, scored, hadMatch: cleared.length > 0, spawned };
 }
 
 export function findHint(b: Board): [Pos, Pos] | null {

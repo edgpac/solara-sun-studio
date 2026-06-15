@@ -137,7 +137,7 @@ export function DemoBoard() {
   const boardPx = cellPx * DEMO_SIZE;
 
   return (
-    <div className="w-full max-w-sm mx-auto px-3 relative">
+    <div className="w-full max-w-sm sm:max-w-lg lg:max-w-2xl mx-auto px-3 relative">
       {/* Label */}
       <div className="text-center mb-2">
         <span className="text-[9px] uppercase tracking-[0.35em] text-cream/40">

@@ -13,7 +13,7 @@ import {
 } from "@/lib/game/engine";
 import { SunPiece } from "./SunPiece";
 import { SUN_AURA, SUN_IMAGES } from "@/lib/game/art";
-import { playMatch, playSwap, playLevelComplete } from "@/lib/game/audio";
+import { playMatch, playSwap, playLevelComplete, playSpecial } from "@/lib/game/audio";
 
 const SWAP_MS = 180;
 const POP_MS = 380;
@@ -37,11 +37,14 @@ interface Spark {
 interface Props {
   moves: number;
   targetThree: number;
+  bonusMoves?: number;
+  hintSignal?: number;
+  shuffleSignal?: number;
   onComplete: (result: { score: number; stars: number; cleared: boolean }) => void;
   onStats?: (s: { score: number; moves: number; combo: number }) => void;
 }
 
-export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStats }: Props) {
+export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hintSignal = 0, shuffleSignal = 0, onComplete, onStats }: Props) {
   // Empty placeholder on first render so SSR & client hydration agree.
   const [board, setBoard] = useState<Board>(() =>
     Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => null)),
@@ -68,6 +71,18 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
   const boardRef = useRef<HTMLDivElement>(null);
   const [cellPx, setCellPx] = useState(48);
   const completedRef = useRef(false);
+  const prevBonusRef = useRef(0);
+
+  // When the parent grants bonus moves (e.g. after a rewarded ad), reset the
+  // completion gate and inject the extra moves so the game continues.
+  useEffect(() => {
+    if (bonusMoves > prevBonusRef.current) {
+      const added = bonusMoves - prevBonusRef.current;
+      prevBonusRef.current = bonusMoves;
+      completedRef.current = false;
+      setMoves((m) => m + added);
+    }
+  }, [bonusMoves]);
 
   // Responsive cell size.
   useLayoutEffect(() => {
@@ -89,6 +104,21 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
     }, 5000);
     return () => clearTimeout(t);
   }, [board, busy]);
+
+  // Immediate hint on demand from booster bar.
+  useEffect(() => {
+    if (hintSignal === 0) return;
+    const h = findHint(board);
+    if (h) setHintPair(h);
+  }, [hintSignal]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Shuffle board on demand from booster bar.
+  useEffect(() => {
+    if (shuffleSignal === 0) return;
+    setBoard(createBoard());
+    setSelected(null);
+    setHintPair(null);
+  }, [shuffleSignal]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // End-of-level check.
   useEffect(() => {
@@ -135,12 +165,21 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
       setHintPair(null);
       setSelected(null);
 
+      // Capture special status before swap so we know what moved where.
+      const aWasSpecial = board[a[0]][a[1]]?.special !== "none";
+      const bWasSpecial = board[b[0]][b[1]]?.special !== "none";
+
       let curr = swap(board, a, b);
       setBoard(curr);
       await sleep(SWAP_MS);
 
-      // Validate: if no match results, swap back.
-      if (findMatches(curr).length === 0) {
+      // After swap: aCell sits at b, bCell sits at a.
+      const forced: Pos[] = [];
+      if (aWasSpecial) forced.push(b);
+      if (bWasSpecial) forced.push(a);
+
+      // Reject if no normal match and no specials to activate.
+      if (findMatches(curr).length === 0 && forced.length === 0) {
         curr = swap(curr, a, b);
         setBoard(curr);
         await sleep(SWAP_MS);
@@ -154,10 +193,18 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
       let chain = 0;
       let chainScore = 0;
       let pivot: Pos | undefined = b;
+      let pendingForce: Pos[] | undefined = forced.length > 0 ? forced : undefined;
       while (true) {
-        const step = resolveStep(curr, pivot);
+        const step = resolveStep(curr, pivot, pendingForce);
+        pendingForce = undefined;
         if (!step.hadMatch) break;
         chain++;
+
+        // Play special sound for any specials that fired this step.
+        const firedSpecial = step.cleared.find(({ cell }) => cell.special !== "none");
+        if (firedSpecial) {
+          playSpecial(firedSpecial.cell.special as "beam-h" | "beam-v" | "bomb" | "eclipse");
+        }
         playMatch(chain);
         pivot = undefined;
 
@@ -202,6 +249,14 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
       setCombo(0);
       setComboFlash(null);
       setBusy(false);
+
+      // Cascade replenishment: each chain step earns back 1 move.
+      // chain=1 (single match) → net 0 moves spent.
+      // chain=2 (one cascade) → net +1 move.
+      // chain=3+ → the player gains moves, letting skilled play run indefinitely.
+      if (chain > 0) {
+        setMoves((m) => m + chain);
+      }
 
       // Early victory: hit max stars threshold.
       if (!completedRef.current && score + chainScore >= targetThree && moves - 1 > 0) {
@@ -289,7 +344,7 @@ export function GameBoard({ moves: initialMoves, targetThree, onComplete, onStat
   }, [hintPair]);
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 mt-4">
+    <div className="w-full max-w-2xl sm:max-w-3xl lg:max-w-4xl mx-auto px-3 sm:px-4">
       <div
         ref={boardRef}
         className="relative w-full aspect-square rounded-3xl overflow-hidden"
