@@ -2,6 +2,7 @@ interface Props {
   moves: number;
   adUsed: boolean;
   watchingAd: boolean;
+  hintsOn: boolean;
   onMap: () => void;
   onHint: () => void;
   onShuffle: () => void;
@@ -62,7 +63,7 @@ function Booster({
   );
 }
 
-export function BottomBar({ moves, adUsed, watchingAd, onMap, onHint, onShuffle, onWatchAd }: Props) {
+export function BottomBar({ moves, adUsed, watchingAd, hintsOn, onMap, onHint, onShuffle, onWatchAd }: Props) {
   const showAd = moves <= 10 && !adUsed;
 
   return (
@@ -76,7 +77,7 @@ export function BottomBar({ moves, adUsed, watchingAd, onMap, onHint, onShuffle,
       }}
     >
       <Booster icon="🗺" label="Map"     onClick={onMap} />
-      <Booster icon="💡" label="Hint"    onClick={onHint} />
+      <Booster icon="💡" label={hintsOn ? "Hints On" : "Hints Off"} onClick={onHint} accent={hintsOn ? "gold" : undefined} />
       <Booster icon="🔀" label="Shuffle" onClick={onShuffle} />
       <Booster
         icon={watchingAd ? "⏳" : "📺"}

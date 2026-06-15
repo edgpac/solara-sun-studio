@@ -39,13 +39,13 @@ interface Props {
   moves: number;
   targetThree: number;
   bonusMoves?: number;
-  hintSignal?: number;
+  hintsOn?: boolean;
   shuffleSignal?: number;
   onComplete: (result: { score: number; stars: number; cleared: boolean }) => void;
   onStats?: (s: { score: number; moves: number; combo: number }) => void;
 }
 
-export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hintSignal = 0, shuffleSignal = 0, onComplete, onStats }: Props) {
+export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hintsOn = true, shuffleSignal = 0, onComplete, onStats }: Props) {
   // Empty placeholder on first render so SSR & client hydration agree.
   const [board, setBoard] = useState<Board>(() =>
     Array.from({ length: ROWS }, () => Array.from({ length: COLS }, () => null)),
@@ -97,22 +97,19 @@ export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hi
     return () => ro.disconnect();
   }, []);
 
-  // Hint after inactivity.
+  // Hints — show after brief inactivity when on, clear immediately when off.
   useEffect(() => {
+    if (!hintsOn) {
+      setHintPair(null);
+      return;
+    }
     if (busy) return;
     const t = setTimeout(() => {
       const h = findHint(board);
       if (h) setHintPair(h);
-    }, 5000);
+    }, 1500);
     return () => clearTimeout(t);
-  }, [board, busy]);
-
-  // Immediate hint on demand from booster bar.
-  useEffect(() => {
-    if (hintSignal === 0) return;
-    const h = findHint(board);
-    if (h) setHintPair(h);
-  }, [hintSignal]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [board, busy, hintsOn]);
 
   // Shuffle board on demand from booster bar.
   useEffect(() => {

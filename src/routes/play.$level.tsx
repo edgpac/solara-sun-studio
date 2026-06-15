@@ -89,7 +89,7 @@ function Session({
   const [done, setDone] = useState<CompletionState | null>(null);
   const [seed, setSeed] = useState(0);
   const [bonusMoves, setBonusMoves] = useState(0);
-  const [hintSignal, setHintSignal] = useState(0);
+  const [hintsOn, setHintsOn] = useState(true);
   const [shuffleSignal, setShuffleSignal] = useState(0);
   const [adUsed, setAdUsed] = useState(false);
   const [watchingAd, setWatchingAd] = useState(false);
@@ -151,7 +151,7 @@ function Session({
             moves={level.moves}
             targetThree={level.stars[2]}
             bonusMoves={bonusMoves}
-            hintSignal={hintSignal}
+            hintsOn={hintsOn}
             shuffleSignal={shuffleSignal}
             onStats={setStats}
             onComplete={handleComplete}
@@ -164,7 +164,8 @@ function Session({
         adUsed={adUsed}
         watchingAd={watchingAd}
         onMap={navigateBack}
-        onHint={() => setHintSignal((n) => n + 1)}
+        hintsOn={hintsOn}
+        onHint={() => setHintsOn((h) => !h)}
         onShuffle={() => setShuffleSignal((n) => n + 1)}
         onWatchAd={handleWatchAd}
       />
