@@ -133,8 +133,8 @@ function Session({
   };
 
   return (
-    <main className="scene-cabo h-screen w-full flex flex-col overflow-hidden relative" style={{ paddingTop: "calc(var(--sat, env(safe-area-inset-top, 0px)) + 4rem)" }}>
-      <div className="relative z-10 flex flex-col flex-1 overflow-hidden">
+    <main className="scene-cabo h-screen w-full flex flex-col overflow-hidden relative" style={{ paddingTop: "var(--sat, env(safe-area-inset-top, 0px))" }}>
+      <div className="relative z-10 flex flex-col flex-1 min-h-0 overflow-hidden">
         <HUD
           level={level.id}
           region={level.region}
@@ -145,7 +145,7 @@ function Session({
           moves={stats.moves}
           combo={stats.combo}
         />
-        <div className="flex-1 flex items-center justify-center overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-hidden p-1.5 sm:p-2">
           <GameBoard
             key={seed}
             moves={level.moves}

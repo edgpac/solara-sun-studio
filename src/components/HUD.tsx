@@ -35,7 +35,7 @@ export function HUD({ level, region, name, score, sessionScore, targetThree, mov
   }, [stars]);
 
   return (
-    <div className="w-full max-w-2xl sm:max-w-3xl lg:max-w-4xl mx-auto px-3 pt-2 pb-1">
+    <div className="w-full px-3 pt-1 pb-0.5">
       {/* Game HUD panel */}
       <div
         style={{
@@ -48,7 +48,7 @@ export function HUD({ level, region, name, score, sessionScore, targetThree, mov
         }}
       >
         {/* ── Row 1: level label · name · sound ── */}
-        <div className="flex items-center justify-between px-3 pt-2 pb-0.5 gap-2">
+        <div className="flex items-center justify-between px-3 pt-1.5 pb-0 gap-2">
           <div
             className="text-[9px] uppercase tracking-[0.22em] leading-none flex-shrink-0"
             style={{ color: "oklch(0.62 0.10 280)" }}
@@ -75,11 +75,11 @@ export function HUD({ level, region, name, score, sessionScore, targetThree, mov
         </div>
 
         {/* ── Row 2: Score pill · Stars · Big Moves ── */}
-        <div className="flex items-center justify-between px-3 py-1.5 gap-3">
+        <div className="flex items-center justify-between px-3 py-1 gap-3">
 
           {/* Score badge — gold-bordered pill */}
           <div
-            className="flex flex-col items-center flex-shrink-0 px-3 py-1.5 rounded-xl tabular-nums"
+            className="flex flex-col items-center flex-shrink-0 px-2.5 py-1 rounded-xl tabular-nums"
             style={{
               background: "oklch(0.14 0.06 270)",
               border: "2px solid oklch(0.55 0.18 72 / 0.7)",
@@ -110,7 +110,7 @@ export function HUD({ level, region, name, score, sessionScore, targetThree, mov
                   key={s}
                   className={bouncing ? "star-earned" : ""}
                   style={{
-                    fontSize: "clamp(1.6rem, 8vw, 2.2rem)",
+                    fontSize: "clamp(1.2rem, 6vw, 1.8rem)",
                     lineHeight: 1,
                     display: "block",
                     color: lit ? "oklch(0.90 0.22 80)" : "oklch(0.32 0.06 270)",
@@ -139,7 +139,7 @@ export function HUD({ level, region, name, score, sessionScore, targetThree, mov
 
           {/* Moves — huge, Candy Crush style */}
           <div
-            className="flex flex-col items-center flex-shrink-0 px-3 py-1.5 rounded-xl"
+            className="flex flex-col items-center flex-shrink-0 px-2.5 py-1 rounded-xl"
             style={{
               background: movesLow ? "oklch(0.22 0.12 20)" : "oklch(0.14 0.06 270)",
               border: movesLow
@@ -156,7 +156,7 @@ export function HUD({ level, region, name, score, sessionScore, targetThree, mov
             <span
               className="display font-bold leading-none tabular-nums"
               style={{
-                fontSize: "clamp(1.7rem, 8vw, 2.4rem)",
+                fontSize: "clamp(1.4rem, 6vw, 2rem)",
                 color: movesLow ? "oklch(0.80 0.26 25)" : "oklch(0.97 0.01 80)",
                 textShadow: movesLow ? "0 0 20px oklch(0.75 0.26 25 / 0.8)" : "0 2px 0 oklch(0 0 0 / 0.5)",
                 animation: movesLow ? "pulse-red 1s ease-in-out infinite" : "none",
@@ -168,7 +168,7 @@ export function HUD({ level, region, name, score, sessionScore, targetThree, mov
         </div>
 
         {/* ── Progress bar with 3 star threshold markers ── */}
-        <div className="px-3 pb-2.5">
+        <div className="px-3 pb-1.5">
           <div
             className="relative rounded-full overflow-visible"
             style={{ height: "7px", background: "oklch(0.12 0.04 270)" }}

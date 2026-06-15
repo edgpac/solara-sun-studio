@@ -44,7 +44,7 @@ function Booster({
       className="flex flex-col items-center gap-1 active:translate-y-[3px] transition-transform duration-[60ms] disabled:opacity-35"
     >
       <div
-        className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-2xl sm:text-3xl"
+        className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-xl sm:text-2xl"
         style={{
           background: bg,
           boxShadow: `inset 0 2px 0 oklch(1 0 0 / 0.25), ${ring}, ${glow}, 0 8px 20px oklch(0 0 0 / 0.55)`,
@@ -69,8 +69,8 @@ export function BottomBar({ moves, adUsed, watchingAd, onMap, onHint, onShuffle,
     <div
       className="w-full flex items-end justify-around px-5"
       style={{
-        paddingTop: "0.75rem",
-        paddingBottom: "calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 0.75rem)",
+        paddingTop: "0.5rem",
+        paddingBottom: "calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 0.5rem)",
         background: "linear-gradient(180deg, oklch(0.14 0.06 272 / 0.0), oklch(0.10 0.05 272 / 0.97))",
         borderTop: "1px solid oklch(0.35 0.10 270 / 0.5)",
       }}

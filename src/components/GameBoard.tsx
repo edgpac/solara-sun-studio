@@ -344,11 +344,14 @@ export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hi
   }, [hintPair]);
 
   return (
-    <div className="w-full max-w-2xl sm:max-w-3xl lg:max-w-4xl mx-auto px-3 sm:px-4">
+    <div className="h-full w-full flex items-center justify-center">
       <div
         ref={boardRef}
-        className="relative w-full aspect-square rounded-3xl overflow-hidden"
+        className="relative rounded-3xl overflow-hidden"
         style={{
+          aspectRatio: "1 / 1",
+          height: "100%",
+          maxWidth: "100%",
           background:
             "radial-gradient(ellipse at 50% 30%, oklch(0.28 0.08 60 / 0.8), oklch(0.16 0.04 30 / 0.95))",
           boxShadow:
