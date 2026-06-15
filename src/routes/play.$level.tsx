@@ -89,7 +89,7 @@ function Session({
   const [done, setDone] = useState<CompletionState | null>(null);
   const [seed, setSeed] = useState(0);
   const [bonusMoves, setBonusMoves] = useState(0);
-  const [hintsOn, setHintsOn] = useState(true);
+  const [hintsOn, setHintsOn] = useState(false);
   const [shuffleSignal, setShuffleSignal] = useState(0);
   const [adUsed, setAdUsed] = useState(false);
   const [watchingAd, setWatchingAd] = useState(false);
