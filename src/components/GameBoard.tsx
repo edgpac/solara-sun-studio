@@ -97,23 +97,17 @@ export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hi
     return () => ro.disconnect();
   }, []);
 
-  // When hints toggled ON: show immediately. When OFF: clear.
+  // Show hint when on and board is idle; clear when off or busy.
   useEffect(() => {
     if (!hintsOn) {
       setHintPair(null);
       return;
     }
-    const h = findHint(board);
-    if (h) setHintPair(h);
-  }, [hintsOn]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Re-show hint after each move while hints are on.
-  useEffect(() => {
-    if (!hintsOn || busy) return;
+    if (busy) return;
     const t = setTimeout(() => {
       const h = findHint(board);
-      if (h) setHintPair(h);
-    }, 800);
+      setHintPair(h);
+    }, 350);
     return () => clearTimeout(t);
   }, [board, busy, hintsOn]);
 

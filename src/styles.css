@@ -246,7 +246,8 @@
 .sun-piece:hover .sun-piece-halo,
 .sun-piece.is-selected .sun-piece-halo { opacity: 1; }
 .sun-piece.is-selected { transform: scale(1.1); filter: brightness(1.22); z-index: 10; }
-.sun-piece.is-hint     { animation: sun-hint 1.2s ease-in-out infinite; }
+.sun-piece.is-hint     { animation: sun-hint 0.9s ease-in-out infinite; z-index: 5; }
+.sun-piece.is-hint .sun-piece-halo { opacity: 1; }
 .sun-piece.is-pop      { animation: sun-pop 0.45s ease-out forwards; }
 .sun-piece.is-fall     { animation: sun-fall 0.32s cubic-bezier(0.5, 0, 0.4, 1.2); }
 .sun-piece.is-special         { animation: special-pulse 2.4s ease-in-out infinite; }
@@ -260,7 +261,7 @@
 @keyframes special-pulse-bomb   { 0%,100%{filter:drop-shadow(0 0 10px oklch(0.80 0.25 25/.6))} 50%{filter:drop-shadow(0 0 22px oklch(0.80 0.25 25/1))} }
 @keyframes special-pulse-eclipse{ 0%{filter:drop-shadow(0 0 10px oklch(0.80 0.22 300/.6))} 33%{filter:drop-shadow(0 0 20px oklch(0.80 0.22 60/.9))} 66%{filter:drop-shadow(0 0 20px oklch(0.80 0.22 180/.9))} 100%{filter:drop-shadow(0 0 10px oklch(0.80 0.22 300/.6))} }
 @keyframes sun-breathe { 0%,100%{transform:scale(1) rotate(0deg)} 50%{transform:scale(1.015) rotate(.6deg)} }
-@keyframes sun-hint    { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1);filter:brightness(1.35)} }
+@keyframes sun-hint    { 0%,100%{transform:scale(1);filter:brightness(1) drop-shadow(0 0 6px oklch(0.88 0.22 75/0.4))} 50%{transform:scale(1.18);filter:brightness(1.6) drop-shadow(0 0 22px oklch(0.88 0.22 75/1)) drop-shadow(0 0 8px oklch(1 0.1 80/0.9))} }
 @keyframes sun-pop     { 0%{transform:scale(1);opacity:1;filter:brightness(1.5)} 40%{transform:scale(1.35) rotate(15deg);opacity:1;filter:brightness(2)} 100%{transform:scale(0) rotate(180deg);opacity:0} }
 @keyframes sun-fall    { 0%{transform:translateY(-30%);opacity:0} 100%{transform:translateY(0);opacity:1} }
 
