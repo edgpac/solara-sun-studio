@@ -62,7 +62,7 @@ function Title() {
             style={{ animation: "sun-breathe 6s ease-in-out infinite" }}
           />
           <div className="text-left flex-1 min-w-0">
-            <div className="text-[9px] uppercase tracking-[0.4em] text-cream/60 leading-none mb-1">
+            <div className="text-[8px] uppercase tracking-[0.12em] text-cream/60 leading-none mb-1 whitespace-nowrap">
               Cabo San Lucas · México
             </div>
             <div
