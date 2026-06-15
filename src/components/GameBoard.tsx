@@ -45,7 +45,7 @@ interface Props {
   onStats?: (s: { score: number; moves: number; combo: number }) => void;
 }
 
-export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hintsOn = true, shuffleSignal = 0, onComplete, onStats }: Props) {
+export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hintsOn = false, shuffleSignal = 0, onComplete, onStats }: Props) {
   // Empty placeholder on first render so SSR & client hydration agree.
   const [board, setBoard] = useState<Board>(() =>
     Array.from({ length: ROWS }, () => Array.from({ length: COLS }, () => null)),
