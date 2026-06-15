@@ -1,5 +1,5 @@
 // Match-3 engine — pure functions, no React.
-// Board: 8×8 of Cell|null. Pieces have stable ids for animation continuity.
+// Board: 8×11 of Cell|null. Pieces have stable ids for animation continuity.
 
 export type Color = 0 | 1 | 2 | 3 | 4 | 5;
 export type Special = "none" | "beam-h" | "beam-v" | "eclipse" | "bomb";
@@ -13,7 +13,10 @@ export interface Cell {
 export type Board = (Cell | null)[][];
 export type Pos = [number, number];
 
-export const SIZE = 8;
+export const COLS = 8;
+export const ROWS = 11;
+/** @deprecated use COLS or ROWS */
+export const SIZE = COLS;
 export const COLORS: readonly Color[] = [0, 1, 2, 3, 4, 5] as const;
 
 let _id = 1;
@@ -24,14 +27,14 @@ export const newCell = (color: Color, special: Special = "none"): Cell => ({
 });
 const rnd = (): Color => COLORS[Math.floor(Math.random() * COLORS.length)] as Color;
 
-const inBounds = (r: number, c: number) => r >= 0 && r < SIZE && c >= 0 && c < SIZE;
+const inBounds = (r: number, c: number) => r >= 0 && r < ROWS && c >= 0 && c < COLS;
 
 export function createBoard(): Board {
   let b: Board;
   let safety = 0;
   do {
-    b = Array.from({ length: SIZE }, () =>
-      Array.from({ length: SIZE }, () => newCell(rnd())),
+    b = Array.from({ length: ROWS }, () =>
+      Array.from({ length: COLS }, () => newCell(rnd())),
     );
     safety++;
   } while (findMatches(b).length > 0 && safety < 50);
@@ -47,11 +50,11 @@ interface MatchGroup {
 export function findMatches(b: Board): MatchGroup[] {
   const groups: MatchGroup[] = [];
   // Horizontal runs
-  for (let r = 0; r < SIZE; r++) {
+  for (let r = 0; r < ROWS; r++) {
     let start = 0;
-    for (let c = 1; c <= SIZE; c++) {
+    for (let c = 1; c <= COLS; c++) {
       const continues =
-        c < SIZE &&
+        c < COLS &&
         b[r][c] !== null &&
         b[r][start] !== null &&
         b[r][c]!.color === b[r][start]!.color;
@@ -67,11 +70,11 @@ export function findMatches(b: Board): MatchGroup[] {
     }
   }
   // Vertical runs
-  for (let c = 0; c < SIZE; c++) {
+  for (let c = 0; c < COLS; c++) {
     let start = 0;
-    for (let r = 1; r <= SIZE; r++) {
+    for (let r = 1; r <= ROWS; r++) {
       const continues =
-        r < SIZE &&
+        r < ROWS &&
         b[r][c] !== null &&
         b[start][c] !== null &&
         b[r][c]!.color === b[start][c]!.color;
@@ -186,8 +189,8 @@ export function resolveStep(b: Board, swapPoint?: Pos, forceTrigger?: Pos[]): St
     const cell = b[r][c];
     if (!cell || cell.special === "none") continue;
     const blast: Pos[] = [];
-    if (cell.special === "beam-h") for (let cc = 0; cc < SIZE; cc++) blast.push([r, cc]);
-    else if (cell.special === "beam-v") for (let rr = 0; rr < SIZE; rr++) blast.push([rr, c]);
+    if (cell.special === "beam-h") for (let cc = 0; cc < COLS; cc++) blast.push([r, cc]);
+    else if (cell.special === "beam-v") for (let rr = 0; rr < ROWS; rr++) blast.push([rr, c]);
     else if (cell.special === "bomb") {
       for (let dr = -1; dr <= 1; dr++)
         for (let dc = -1; dc <= 1; dc++) {
@@ -196,8 +199,8 @@ export function resolveStep(b: Board, swapPoint?: Pos, forceTrigger?: Pos[]): St
           if (inBounds(nr, nc)) blast.push([nr, nc]);
         }
     } else if (cell.special === "eclipse") {
-      for (let rr = 0; rr < SIZE; rr++)
-        for (let cc = 0; cc < SIZE; cc++)
+      for (let rr = 0; rr < ROWS; rr++)
+        for (let cc = 0; cc < COLS; cc++)
           if (b[rr][cc] && b[rr][cc]!.color === cell.color) blast.push([rr, cc]);
     }
     for (const p of blast) {
@@ -226,9 +229,9 @@ export function resolveStep(b: Board, swapPoint?: Pos, forceTrigger?: Pos[]): St
   }
 
   // Gravity per column.
-  for (let c = 0; c < SIZE; c++) {
-    let write = SIZE - 1;
-    for (let r = SIZE - 1; r >= 0; r--) {
+  for (let c = 0; c < COLS; c++) {
+    let write = ROWS - 1;
+    for (let r = ROWS - 1; r >= 0; r--) {
       if (nb[r][c]) {
         if (write !== r) {
           nb[write][c] = nb[r][c];
@@ -245,8 +248,8 @@ export function resolveStep(b: Board, swapPoint?: Pos, forceTrigger?: Pos[]): St
 }
 
 export function findHint(b: Board): [Pos, Pos] | null {
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
       for (const [dr, dc] of [
         [0, 1],
         [1, 0],

@@ -3,7 +3,8 @@ import {
   type Board,
   type Cell,
   type Pos,
-  SIZE,
+  COLS,
+  ROWS,
   createBoard,
   findHint,
   findMatches,
@@ -47,7 +48,7 @@ interface Props {
 export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hintSignal = 0, shuffleSignal = 0, onComplete, onStats }: Props) {
   // Empty placeholder on first render so SSR & client hydration agree.
   const [board, setBoard] = useState<Board>(() =>
-    Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => null)),
+    Array.from({ length: ROWS }, () => Array.from({ length: COLS }, () => null)),
   );
   useEffect(() => {
     setBoard(createBoard());
@@ -68,6 +69,7 @@ export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hi
     onStats?.({ score, moves, combo });
   }, [score, moves, combo, onStats]);
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const [cellPx, setCellPx] = useState(48);
   const completedRef = useRef(false);
@@ -84,14 +86,14 @@ export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hi
     }
   }, [bonusMoves]);
 
-  // Responsive cell size.
+  // Responsive cell size — observe the wrapper so cellPx fits both axes.
   useLayoutEffect(() => {
-    if (!boardRef.current) return;
+    if (!wrapperRef.current) return;
     const ro = new ResizeObserver((entries) => {
-      const w = entries[0].contentRect.width;
-      setCellPx(Math.floor(w / SIZE));
+      const { width, height } = entries[0].contentRect;
+      setCellPx(Math.floor(Math.min(width / COLS, height / ROWS)));
     });
-    ro.observe(boardRef.current);
+    ro.observe(wrapperRef.current);
     return () => ro.disconnect();
   }, []);
 
@@ -305,7 +307,7 @@ export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hi
     } else {
       target = [d.pos[0] + (dy > 0 ? 1 : -1), d.pos[1]];
     }
-    if (target[0] < 0 || target[0] >= SIZE || target[1] < 0 || target[1] >= SIZE) return;
+    if (target[0] < 0 || target[0] >= ROWS || target[1] < 0 || target[1] >= COLS) return;
     d.moved = true;
     void performSwap(d.pos, target);
   };
@@ -328,8 +330,8 @@ export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hi
   // Flat list of cells for stable-key absolute positioning.
   const flatCells = useMemo(() => {
     const out: { cell: Cell; r: number; c: number }[] = [];
-    for (let r = 0; r < SIZE; r++) {
-      for (let c = 0; c < SIZE; c++) {
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
         const cell = board[r][c];
         if (cell) out.push({ cell, r, c });
       }
@@ -337,21 +339,21 @@ export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hi
     return out;
   }, [board]);
 
-  const boardPx = cellPx * SIZE;
+  const boardWidthPx = cellPx * COLS;
+  const boardHeightPx = cellPx * ROWS;
   const hintSet = useMemo(() => {
     if (!hintPair) return new Set<string>();
     return new Set(hintPair.map(([r, c]) => `${r},${c}`));
   }, [hintPair]);
 
   return (
-    <div className="h-full w-full flex items-center justify-center">
+    <div ref={wrapperRef} className="h-full w-full flex items-center justify-center">
       <div
         ref={boardRef}
-        className="relative rounded-3xl overflow-hidden"
+        className="relative rounded-3xl overflow-hidden flex-shrink-0"
         style={{
-          aspectRatio: "1 / 1",
-          height: "100%",
-          maxWidth: "100%",
+          width: boardWidthPx,
+          height: boardHeightPx,
           background:
             "radial-gradient(ellipse at 50% 30%, oklch(0.28 0.08 60 / 0.8), oklch(0.16 0.04 30 / 0.95))",
           boxShadow:
@@ -370,7 +372,7 @@ export function GameBoard({ moves: initialMoves, targetThree, bonusMoves = 0, hi
         />
 
         {/* Board playfield */}
-        <div className="absolute inset-0" style={{ width: boardPx, height: boardPx }}>
+        <div className="absolute inset-0" style={{ width: boardWidthPx, height: boardHeightPx }}>
           {/* Active cells */}
           {flatCells.map(({ cell, r, c }) => {
             const isSel = selected?.[0] === r && selected?.[1] === c;

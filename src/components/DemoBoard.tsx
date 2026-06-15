@@ -3,7 +3,8 @@ import {
   type Board,
   type Cell,
   type Pos,
-  SIZE,
+  COLS,
+  ROWS,
   createBoard,
   findHint,
   resolveStep,
@@ -25,7 +26,7 @@ interface Spark { id: number; x: number; y: number; dx: number; dy: number; colo
 
 export function DemoBoard() {
   const [board, setBoard] = useState<Board>(() =>
-    Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => null)),
+    Array.from({ length: ROWS }, () => Array.from({ length: COLS }, () => null)),
   );
   useEffect(() => { setBoard(createBoard()); }, []);
 
