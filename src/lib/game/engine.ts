@@ -139,24 +139,28 @@ export function resolveStep(b: Board, swapPoint?: Pos, forceTrigger?: Pos[]): St
   });
 
   // Pick the dominant group for special spawning.
-  const longest = matches.reduce((a, m) => (m.cells.length > a.cells.length ? m : a), matches[0]);
-  const spawnPos: Pos =
-    swapPoint &&
-    matches.some((m) => m.cells.some(([r, c]) => r === swapPoint[0] && c === swapPoint[1]))
-      ? swapPoint
-      : longest.cells[Math.floor(longest.cells.length / 2)];
-
+  // A forced special trigger (e.g. swapping a bomb with no new match) has an
+  // empty `matches` array — there's nothing to spawn from in that case.
   let spawned: StepResult["spawned"];
-  if (intersects.length > 0) {
-    spawned = { pos: intersects[0], type: "bomb", color: longest.color };
-  } else if (longest.cells.length >= 5) {
-    spawned = { pos: spawnPos, type: "eclipse", color: longest.color };
-  } else if (longest.cells.length === 4) {
-    spawned = {
-      pos: spawnPos,
-      type: longest.dir === "h" ? "beam-v" : "beam-h",
-      color: longest.color,
-    };
+  if (matches.length > 0) {
+    const longest = matches.reduce((a, m) => (m.cells.length > a.cells.length ? m : a), matches[0]);
+    const spawnPos: Pos =
+      swapPoint &&
+      matches.some((m) => m.cells.some(([r, c]) => r === swapPoint[0] && c === swapPoint[1]))
+        ? swapPoint
+        : longest.cells[Math.floor(longest.cells.length / 2)];
+
+    if (intersects.length > 0) {
+      spawned = { pos: intersects[0], type: "bomb", color: longest.color };
+    } else if (longest.cells.length >= 5) {
+      spawned = { pos: spawnPos, type: "eclipse", color: longest.color };
+    } else if (longest.cells.length === 4) {
+      spawned = {
+        pos: spawnPos,
+        type: longest.dir === "h" ? "beam-v" : "beam-h",
+        color: longest.color,
+      };
+    }
   }
 
   // BFS clearing — specials inside the cleared set trigger their blasts.
